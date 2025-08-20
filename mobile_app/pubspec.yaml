@@ -1,0 +1,70 @@
+name: kitchenit
+description: A cross-platform mobile app to search, save, and take notes on recipes. 
+publish_to: "none" # prevent accidental publishing to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0" # ensure Dart 3.x
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI and navigation
+  cupertino_icons: ^1.0.8
+  flutter_hooks: ^0.20.5
+  provider: ^6.1.2
+  go_router: ^14.2.3
+
+  # Networking
+  http: ^1.2.2
+  dio: ^5.7.0
+
+  # State & storage
+  shared_preferences: ^2.3.3
+  flutter_secure_storage: ^9.2.2
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+
+  # JSON serialization
+  json_annotation: ^4.9.0
+
+  # UI enhancements
+  google_fonts: ^6.2.1
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+
+  # Form validation
+  form_validator: ^2.1.1
+
+  # Logging / error tracking
+  logger: ^2.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  build_runner: ^2.4.11
+  json_serializable: ^6.8.0
+  mockito: ^5.4.4
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images
+    - assets/icons/
+    #assets/fonts/
+
+  fonts:
+    - family: Lora
+      fonts:
+        - asset: assets/fonts/Lora-Regular.ttf
+        - asset: assets/fonts/Lora-Bold.ttf
+          weight: 700
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700

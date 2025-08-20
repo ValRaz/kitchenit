@@ -1,0 +1,22 @@
+# --- Node backend ---
+/backend/node_modules/
+/backend/.env
+/backend/.env.local
+/backend/.DS_Store
+/backend/logs/
+/backend/coverage/
+
+# lockfile OK to commit; comment next line ONLY if you want to ignore it
+# /backend/package-lock.json
+
+# --- Flutter mobile app ---
+/mobile_app/build/
+/mobile_app/.dart_tool/
+/mobile_app/.packages
+/mobile_app/ios/Pods/
+/mobile_app/pubspec.lock
+
+# --- IDE/OS noise ---
+.vscode/
+.DS_Store
+Thumbs.db
