@@ -7,14 +7,24 @@ const request = require('supertest');
 const nock = require('nock');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const mongoose = require('mongoose');
+
 let app, mongo, token;
 
 beforeAll(async () => {
+  process.env.NODE_ENV = 'test';
   process.env.JWT_SECRET = 'test-secret';
   process.env.SPOONACULAR_API_KEY = 'fake';
+
   mongo = await MongoMemoryServer.create();
   process.env.MONGO_URI = mongo.getUri();
-  app = require('../index');
+
+  // connect mongoose for tests
+  await mongoose.connect(process.env.MONGO_URI, {
+    dbName: 'kitchenit_test',
+    serverSelectionTimeoutMS: 10000,
+  });
+
+  app = require('../app'); // <-- import the express app only
 
   // Create a user + token
   const signup = await request(app).post('/api/auth/signup').send({

@@ -1,61 +1,45 @@
-/**
- * Kitchen*IT API
- * - Express server with security middleware
- * - Mongo connection
- * - Routes for auth, recipes (Spoonacular proxy), and user data
- * - Ready for Render deployment
- */
 require('dotenv').config();
-const express = require('express');
 const mongoose = require('mongoose');
-const helmet = require('helmet');
-const morgan = require('morgan');
-const cors = require('cors');
-const rateLimit = require('express-rate-limit');
+const http = require('http');
+const app = require('./app');
 
-const authRoutes = require('./routes/auth');
-const recipeRoutes = require('./routes/recipes');
-const userRoutes = require('./routes/user');
-
-const app = express();
-
-// --- Security & parsing middleware ---
-app.use(helmet());
-app.use(express.json({ limit: '1mb' }));
-app.use(cors());
-app.use(morgan('tiny'));
-
-// Basic rate limiter: protect free tiers & deter abuse
-const apiLimiter = rateLimit({
-  windowMs: 60 * 1000, // 1 minute
-  max: 60,             // 60 requests / minute / IP
-});
-app.use('/api/', apiLimiter);
-
-// --- API routes ---
-app.use('/api/auth', authRoutes);
-app.use('/api/recipes', recipeRoutes);
-app.use('/api/user', userRoutes);
-
-// --- Health check (useful for Render) ---
-app.get('/health', (_req, res) => res.json({ ok: true }));
-
-// --- DB connect + server start ---
 const PORT = process.env.PORT || 8080;
-const MONGO_URI = process.env.MONGO_URI;
+const { MONGO_URI, JWT_SECRET } = process.env;
+
+// Fast sanity checks for critical envs
 if (!MONGO_URI) {
   console.error('Missing MONGO_URI');
   process.exit(1);
 }
+if (!JWT_SECRET) {
+  console.error('Missing JWT_SECRET');
+  process.exit(1);
+}
 
-mongoose.connect(MONGO_URI)
-  .then(() => {
+async function start() {
+  try {
+    await mongoose.connect(MONGO_URI, {
+      dbName: 'kitchenit',
+      serverSelectionTimeoutMS: 10000,
+    });
     console.log('MongoDB connected');
-    app.listen(PORT, () => console.log(`API listening on :${PORT}`));
-  })
-  .catch(err => {
-    console.error('Mongo connect error:', err);
-    process.exit(1);
-  });
 
-module.exports = app;
+    const server = http.createServer(app);
+    server.listen(PORT, () => console.log(`API listening on :${PORT}`));
+
+    // Graceful shutdown
+    const shutdown = async (signal) => {
+      console.log(`${signal} received. Shutting down...`);
+      server.close(() => console.log('HTTP server closed'));
+      await mongoose.connection.close(false);
+      process.exit(0);
+    };
+    process.on('SIGINT', () => shutdown('SIGINT'));
+    process.on('SIGTERM', () => shutdown('SIGTERM'));
+  } catch (err) {
+    console.error('Startup error:', err);
+    process.exit(1);
+  }
+}
+
+start();

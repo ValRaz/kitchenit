@@ -10,10 +10,19 @@ let app;
 let mongo;
 
 beforeAll(async () => {
+  process.env.NODE_ENV = 'test';
   process.env.JWT_SECRET = 'test-secret';
+
   mongo = await MongoMemoryServer.create();
   process.env.MONGO_URI = mongo.getUri();
-  app = require('../index');
+
+  // connect mongoose for tests
+  await mongoose.connect(process.env.MONGO_URI, {
+    dbName: 'kitchenit_test',
+    serverSelectionTimeoutMS: 10000,
+  });
+
+  app = require('../app');
 });
 
 afterAll(async () => {

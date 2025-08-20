@@ -11,7 +11,7 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 const auth = require('../middleware/auth');
-const Recipe = require('../models/Recipe');
+const Recipe = require('../models/RecipeModel');
 
 const router = express.Router();
 
